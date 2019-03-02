@@ -1,0 +1,30 @@
+sudo: required
+services: docker
+language: bash
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - docker build -t martynas/backup-h2-to-b2.
+
+    - stage: deploy-latest
+      if: repo = 2m/backup-h2-to-b2
+      script:
+        - docker build -t martynas/backup-h2-to-b2:latest .
+        - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+        - docker push martynas/backup-h2-to-b2:latest
+
+    - stage: deploy
+      if: repo = 2m/backup-h2-to-b2 AND tag =~ ^v
+      script:
+        - docker build -t martynas/backup-h2-to-b2:${TRAVIS_TAG:1} .
+        - docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+        - docker push martynas/backup-h2-to-b2:${TRAVIS_TAG:1}
+
+env:
+  global:
+    # travis encrypt DOCKER_USER=...
+    - secure: "M0g3ZJo+l0YjccHYuG3PofWkQ/uRP5JP3xpq4PjzPRPF9HLI8rRy5LkjAcyEKy60D/VESBew0acUjeFR1PWKNldEg6rzbPQdPidqDdHlYvKVwNsYcZBCRsRXFyvS0qeFxTib/H0ZH4acbFfwVnRygVDX1seSdmOQjVC1026qp++kJlMWZzKQe2FVobYS8OmgJ1U+e9crg4yL7thE4VmzV7FWA34ev237dG/KjLQuzi7YTvX8t5SrZrP9Ls13G+GKg20EeuTMqkkuRgTKrsbhzN0vc8oi6lS/Y9T5bBz6CaD7w6Bhj9xttOx7vDuKUnCm5LyHCj+INiRpYDKlobhBU0s3JeBGKMKSvTgY6fkE3dsYn7/B3wonhZbBGK3wXMzZ+8/UrnABOfYYYMvWXHgnERLUqsZd68a5NmKHlqf6yqICvsBj5wjMFFq1UA4AG7kShb9NlY3Tj0y2yr6pGkDVLl16n0dUH4fYTjDucbUGvuas3yaXvRUFsZirOTGKt5kvad0AbHRbW602ZCDoEED2PkwOm4YGS/iYFvexuS849yNrtC3zyrXO0ZHXkyIn4XRNlx50jYYzNdEzjs5VgNkmqiseoYnjAvC9zbAhD8tuW6l8e+sfJ0F7Yq/6E5hmGaWRJbSR8Ukml7SRctR85R7e7al6LrfoiTVJNWNU1S4U+J8="
+    # travis encrypt DOCKER_PASS=...
+    - secure: "l/utgOgSFD+3prFXYmBeAw3o4F1i3mRpJc0NtCjIUAbppfaAASFf2uDyXdHJR8rhct0g8bYA959jb6xk5/IyTlJu8Coy/v39ZBg+DxCmPPrbXGrfF+D1fY44m1NX1fHTbmvUWIZ4oQ4eFDBEGa5FkUhm2EyUy6fRvHDJrDXymJz0psG4fbetT4CZkqqywHSlatF3uZzkwGvuRAoIv1iAjIL1ttWPTrzUQpgO5ml8GrA3gZ9SmxazauvJp7a4PhCMwpue5gV6UbeY9ux91OQnqgHjxlYYY9lHsa3BK3mWjsJKVA3A0pIQqmBO8/mY2n1IdCU+tXFIQIcCAAgMTHEjsRId9bcSmwgYu9pA/T3LUJ6gHtP0j9YCyiY6Y6lPzD3TqOBdbPeLhA+cIgjf4FdVzjOSg1nQeNFUCsZWiaBiUx1INSGmzG8GfzRWaPyTys7alipWU4o1DOwsOQdHAfn4Rjg1aygODiIC8oZv9wJKHEdOFpJEkdXqNv3keZPUsUtDG8qJFhXFQlPspwO8TaTbdXlyQaEINwtpxAA9gB8bwuEFpGdShUcNNutmZQQFVtcra/0ORUP3s8OYT43h8Skv/ZDlan8S0+CoaSdty0RMR9R9P6FjcPfVyCE1vt3ybIxyuxOjLvqFOOFh0a8VEmYd9rwvwWEhVV+paUSbaiX+/i8="
