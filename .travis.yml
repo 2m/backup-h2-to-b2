@@ -6,7 +6,7 @@ jobs:
   include:
     - stage: test
       script:
-        - docker build -t martynas/backup-h2-to-b2.
+        - docker build -t martynas/backup-h2-to-b2 .
 
     - stage: deploy-latest
       if: repo = 2m/backup-h2-to-b2
